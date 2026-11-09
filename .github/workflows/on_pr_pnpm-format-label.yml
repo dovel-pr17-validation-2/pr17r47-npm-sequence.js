@@ -1,0 +1,31 @@
+name: pnpm-format-label
+
+on:
+  pull_request:
+    types: [labeled]
+
+permissions: {}
+
+jobs:
+  proto:
+    if: ${{ github.event.label.name == 'pnpm format' }}
+    uses: ./.github/workflows/pnpm-format.yml
+    permissions:
+      contents: read
+    secrets:
+      GH_TOKEN_GIT_COMMIT: ${{ secrets.GH_TOKEN_GIT_COMMIT }}
+
+  rm:
+    if: ${{ github.event.label.name == 'pnpm format' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Remove the label
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          LABEL: ${{ github.event.label.name }}
+        run: gh api -X DELETE "repos/$REPO/issues/$PR_NUMBER/labels/${LABEL// /%20}"

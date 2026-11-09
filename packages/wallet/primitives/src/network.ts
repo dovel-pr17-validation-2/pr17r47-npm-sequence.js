@@ -1,0 +1,771 @@
+import { Address } from 'ox'
+
+const DEFAULT_MULTICALL3_ADDRESS: Address.Address = '0xcA11bde05977b3631167028862bE2a173976CA11'
+const SEQUENCE_MULTICALL3_ADDRESS: Address.Address = '0xae96419a81516f063744206d4b5E36f3168280f8'
+
+export enum NetworkType {
+  MAINNET = 'mainnet',
+  TESTNET = 'testnet',
+}
+
+export type BlockExplorerConfig = {
+  name?: string
+  url: string
+}
+
+export interface Network {
+  chainId: number
+  type: NetworkType
+  name: string
+  title?: string
+  rpcUrl: string
+  logoUrl?: string
+  blockExplorer?: BlockExplorerConfig
+  nativeCurrency: {
+    symbol: string
+    name: string
+    decimals: number
+  }
+  deprecated?: true
+  contracts?: {
+    multicall3?: Address.Address
+    ensUniversalResolver?: Address.Address
+  }
+}
+
+export const ChainId = {
+  NONE: 0,
+
+  // Ethereum
+  MAINNET: 1,
+  SEPOLIA: 11155111,
+
+  // Polygon
+  POLYGON: 137,
+  POLYGON_AMOY: 80002,
+
+  // BSC
+  BSC: 56,
+  BSC_TESTNET: 97,
+
+  // Optimism
+  OPTIMISM: 10,
+  OPTIMISM_SEPOLIA: 11155420,
+
+  // Arbitrum One
+  ARBITRUM: 42161,
+  ARBITRUM_SEPOLIA: 421614,
+
+  // Arbitrum Nova
+  ARBITRUM_NOVA: 42170,
+
+  // Avalanche
+  AVALANCHE: 43114,
+  AVALANCHE_TESTNET: 43113,
+
+  // Gnosis Chain (XDAI)
+  GNOSIS: 100,
+
+  // BASE
+  BASE: 8453,
+  BASE_SEPOLIA: 84532,
+
+  // APE Chain
+  APECHAIN: 33139,
+  APECHAIN_TESTNET: 33111,
+
+  // SKALE Nebula
+  SKALE_NEBULA: 1482601649,
+
+  // SKALE Base
+  SKALE_BASE_TESTNET: 324705682,
+
+  // Soneium Minato
+  SONEIUM_MINATO: 1946,
+  SONEIUM: 1868,
+
+  // ETHERLINK
+  ETHERLINK: 42793,
+  ETHERLINK_SHADOWNET_TESTNET: 127823,
+
+  // MONAD
+  MONAD: 143,
+
+  // SOMNIA
+  SOMNIA_TESTNET: 50312,
+  SOMNIA: 5031,
+
+  // KATANA
+  KATANA: 747474,
+
+  // ARC
+  ARC_TESTNET: 5042002,
+
+  // HYPEREVM
+  HYPEREVM: 999,
+
+  // SONIC
+  SONIC: 146,
+
+  // BERACHAIN
+  BERACHAIN: 80094,
+} as const
+
+export type ChainId = (typeof ChainId)[keyof typeof ChainId]
+
+export const ALL: Network[] = [
+  {
+    chainId: ChainId.MAINNET,
+    type: NetworkType.MAINNET,
+    name: 'mainnet',
+    title: 'Ethereum',
+    rpcUrl: getRpcUrl('mainnet'),
+    logoUrl: getLogoUrl(ChainId.MAINNET),
+    blockExplorer: {
+      name: 'Etherscan',
+      url: 'https://etherscan.io/',
+    },
+    nativeCurrency: {
+      symbol: 'ETH',
+      name: 'Ether',
+      decimals: 18,
+    },
+    contracts: {
+      multicall3: DEFAULT_MULTICALL3_ADDRESS,
+      ensUniversalResolver: '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e',
+    },
+  },
+  {
+    chainId: ChainId.SEPOLIA,
+    type: NetworkType.TESTNET,
+    name: 'sepolia',
+    title: 'Sepolia',
+    rpcUrl: getRpcUrl('sepolia'),
+    logoUrl: getLogoUrl(ChainId.SEPOLIA),
+    blockExplorer: {
+      name: 'Etherscan (Sepolia)',
+      url: 'https://sepolia.etherscan.io/',
+    },
+    nativeCurrency: {
+      symbol: 'sETH',
+      name: 'Sepolia Ether',
+      decimals: 18,
+    },
+    contracts: {
+      multicall3: DEFAULT_MULTICALL3_ADDRESS,
+    },
+  },
+  {
+    chainId: ChainId.POLYGON,
+    type: NetworkType.MAINNET,
+    name: 'polygon',
+    title: 'Polygon',
+    rpcUrl: getRpcUrl('polygon'),
+    logoUrl: getLogoUrl(ChainId.POLYGON),
+    blockExplorer: {
+      name: 'Polygonscan',
+      url: 'https://polygonscan.com/',
+    },
+    nativeCurrency: {
+      symbol: 'POL',
+      name: 'POL',
+      decimals: 18,
+    },
+    contracts: {
+      multicall3: DEFAULT_MULTICALL3_ADDRESS,
+    },
+  },
+  {
+    chainId: ChainId.POLYGON_AMOY,
+    type: NetworkType.TESTNET,
+    name: 'amoy',
+    title: 'Polygon Amoy',
+    rpcUrl: getRpcUrl('amoy'),
+    logoUrl: getLogoUrl(ChainId.POLYGON_AMOY),
+    blockExplorer: {
+      name: 'OKLink (Amoy)',
+      url: 'https://www.oklink.com/amoy/',
+    },
+    nativeCurrency: {
+      symbol: 'aPOL',
+      name: 'Amoy POL',
+      decimals: 18,
+    },
+    contracts: {
+      multicall3: DEFAULT_MULTICALL3_ADDRESS,
+    },
+  },
+  {
+    chainId: ChainId.BSC,
+    type: NetworkType.MAINNET,
+    name: 'bsc',
+    title: 'BNB Smart Chain',
+    rpcUrl: getRpcUrl('bsc'),
+    logoUrl: getLogoUrl(ChainId.BSC),
+    blockExplorer: {
+      name: 'BSCScan',
+      url: 'https://bscscan.com/',
+    },
+    nativeCurrency: {
+      symbol: 'BNB',
+      name: 'BNB',
+      decimals: 18,
+    },
+    contracts: {
+      multicall3: DEFAULT_MULTICALL3_ADDRESS,
+    },
+  },
+  {
+    chainId: ChainId.BSC_TESTNET,
+    type: NetworkType.TESTNET,
+    name: 'bsc-testnet',
+    title: 'BNB Smart Chain Testnet',
+    rpcUrl: getRpcUrl('bsc-testnet'),
+    logoUrl: getLogoUrl(ChainId.BSC_TESTNET),
+    blockExplorer: {
+      name: 'BSCScan (Testnet)',
+      url: 'https://testnet.bscscan.com/',
+    },
+    nativeCurrency: {
+      symbol: 'tBNB',
+      name: 'Testnet BNB',
+      decimals: 18,
+    },
+    contracts: {
+      multicall3: DEFAULT_MULTICALL3_ADDRESS,
+    },
+  },
+  {
+    chainId: ChainId.OPTIMISM,
+    type: NetworkType.MAINNET,
+    name: 'optimism',
+    title: 'Optimism',
+    rpcUrl: getRpcUrl('optimism'),
+    logoUrl: getLogoUrl(ChainId.OPTIMISM),
+    blockExplorer: {
+      name: 'Etherscan (Optimism)',
+      url: 'https://optimistic.etherscan.io/',
+    },
+    nativeCurrency: {
+      symbol: 'ETH',
+      name: 'Ether',
+      decimals: 18,
+    },
+    contracts: {
+      multicall3: DEFAULT_MULTICALL3_ADDRESS,
+    },
+  },
+  {
+    chainId: ChainId.OPTIMISM_SEPOLIA,
+    type: NetworkType.TESTNET,
+    name: 'optimism-sepolia',
+    title: 'Optimism Sepolia',
+    rpcUrl: getRpcUrl('optimism-sepolia'),
+    logoUrl: getLogoUrl(ChainId.OPTIMISM_SEPOLIA),
+    blockExplorer: {
+      name: 'Etherscan (Optimism Sepolia)',
+      url: 'https://sepolia-optimistic.etherscan.io/',
+    },
+    nativeCurrency: {
+      symbol: 'sETH',
+      name: 'Sepolia Ether',
+      decimals: 18,
+    },
+    contracts: {
+      multicall3: DEFAULT_MULTICALL3_ADDRESS,
+    },
+  },
+  {
+    chainId: ChainId.ARBITRUM,
+    type: NetworkType.MAINNET,
+    name: 'arbitrum',
+    title: 'Arbitrum One',
+    rpcUrl: getRpcUrl('arbitrum'),
+    logoUrl: getLogoUrl(ChainId.ARBITRUM),
+    blockExplorer: {
+      name: 'Arbiscan',
+      url: 'https://arbiscan.io/',
+    },
+    nativeCurrency: {
+      symbol: 'ETH',
+      name: 'Ether',
+      decimals: 18,
+    },
+    contracts: {
+      multicall3: DEFAULT_MULTICALL3_ADDRESS,
+    },
+  },
+  {
+    chainId: ChainId.ARBITRUM_SEPOLIA,
+    type: NetworkType.TESTNET,
+    name: 'arbitrum-sepolia',
+    title: 'Arbitrum Sepolia',
+    rpcUrl: getRpcUrl('arbitrum-sepolia'),
+    logoUrl: getLogoUrl(ChainId.ARBITRUM_SEPOLIA),
+    blockExplorer: {
+      name: 'Arbiscan (Sepolia Testnet)',
+      url: 'https://sepolia.arbiscan.io/',
+    },
+    nativeCurrency: {
+      symbol: 'sETH',
+      name: 'Sepolia Ether',
+      decimals: 18,
+    },
+    contracts: {
+      multicall3: DEFAULT_MULTICALL3_ADDRESS,
+    },
+  },
+  {
+    chainId: ChainId.ARBITRUM_NOVA,
+    type: NetworkType.MAINNET,
+    name: 'arbitrum-nova',
+    title: 'Arbitrum Nova',
+    rpcUrl: getRpcUrl('arbitrum-nova'),
+    logoUrl: getLogoUrl(ChainId.ARBITRUM_NOVA),
+    blockExplorer: {
+      name: 'Arbiscan Nova',
+      url: 'https://nova.arbiscan.io/',
+    },
+    nativeCurrency: {
+      symbol: 'ETH',
+      name: 'Ether',
+      decimals: 18,
+    },
+    contracts: {
+      multicall3: DEFAULT_MULTICALL3_ADDRESS,
+    },
+  },
+  {
+    chainId: ChainId.AVALANCHE,
+    type: NetworkType.MAINNET,
+    name: 'avalanche',
+    title: 'Avalanche',
+    rpcUrl: getRpcUrl('avalanche'),
+    logoUrl: getLogoUrl(ChainId.AVALANCHE),
+    blockExplorer: {
+      name: 'Snowtrace',
+      url: 'https://subnets.avax.network/c-chain/',
+    },
+    nativeCurrency: {
+      symbol: 'AVAX',
+      name: 'AVAX',
+      decimals: 18,
+    },
+    contracts: {
+      multicall3: DEFAULT_MULTICALL3_ADDRESS,
+    },
+  },
+  {
+    chainId: ChainId.AVALANCHE_TESTNET,
+    type: NetworkType.TESTNET,
+    name: 'avalanche-testnet',
+    title: 'Avalanche Testnet',
+    rpcUrl: getRpcUrl('avalanche-testnet'),
+    logoUrl: getLogoUrl(ChainId.AVALANCHE_TESTNET),
+    blockExplorer: {
+      name: 'Snowtrace (Testnet)',
+      url: 'https://subnets-test.avax.network/c-chain/',
+    },
+    nativeCurrency: {
+      symbol: 'tAVAX',
+      name: 'Testnet AVAX',
+      decimals: 18,
+    },
+    contracts: {
+      multicall3: DEFAULT_MULTICALL3_ADDRESS,
+    },
+  },
+  {
+    chainId: ChainId.GNOSIS,
+    type: NetworkType.MAINNET,
+    name: 'gnosis',
+    title: 'Gnosis Chain',
+    rpcUrl: getRpcUrl('gnosis'),
+    logoUrl: getLogoUrl(ChainId.GNOSIS),
+    blockExplorer: {
+      name: 'Gnosis Chain Explorer',
+      url: 'https://blockscout.com/xdai/mainnet/',
+    },
+    nativeCurrency: {
+      symbol: 'XDAI',
+      name: 'XDAI',
+      decimals: 18,
+    },
+    contracts: {
+      multicall3: DEFAULT_MULTICALL3_ADDRESS,
+    },
+  },
+  {
+    chainId: ChainId.BASE,
+    type: NetworkType.MAINNET,
+    name: 'base',
+    title: 'Base',
+    rpcUrl: getRpcUrl('base'),
+    logoUrl: getLogoUrl(ChainId.BASE),
+    blockExplorer: {
+      name: 'Base Explorer',
+      url: 'https://basescan.org/',
+    },
+    nativeCurrency: {
+      symbol: 'ETH',
+      name: 'Ether',
+      decimals: 18,
+    },
+    contracts: {
+      multicall3: DEFAULT_MULTICALL3_ADDRESS,
+    },
+  },
+  {
+    chainId: ChainId.BASE_SEPOLIA,
+    type: NetworkType.TESTNET,
+    name: 'base-sepolia',
+    title: 'Base Sepolia',
+    rpcUrl: getRpcUrl('base-sepolia'),
+    logoUrl: getLogoUrl(ChainId.BASE_SEPOLIA),
+    blockExplorer: {
+      name: 'Base Sepolia Explorer',
+      url: 'https://base-sepolia.blockscout.com/',
+    },
+    nativeCurrency: {
+      symbol: 'sETH',
+      name: 'Sepolia Ether',
+      decimals: 18,
+    },
+    contracts: {
+      multicall3: DEFAULT_MULTICALL3_ADDRESS,
+    },
+  },
+  {
+    chainId: ChainId.APECHAIN,
+    type: NetworkType.MAINNET,
+    name: 'apechain',
+    title: 'APE Chain',
+    rpcUrl: getRpcUrl('apechain'),
+    logoUrl: getLogoUrl(ChainId.APECHAIN),
+    blockExplorer: {
+      name: 'APE Chain Explorer',
+      url: 'https://apechain.calderaexplorer.xyz/',
+    },
+    nativeCurrency: {
+      symbol: 'APE',
+      name: 'ApeCoin',
+      decimals: 18,
+    },
+    contracts: {
+      multicall3: DEFAULT_MULTICALL3_ADDRESS,
+    },
+  },
+  {
+    chainId: ChainId.APECHAIN_TESTNET,
+    type: NetworkType.TESTNET,
+    name: 'apechain-testnet',
+    title: 'APE Chain Testnet',
+    rpcUrl: getRpcUrl('apechain-testnet'),
+    logoUrl: getLogoUrl(ChainId.APECHAIN_TESTNET),
+    blockExplorer: {
+      name: 'APE Chain Explorer',
+      url: 'https://curtis.explorer.caldera.xyz/',
+    },
+    nativeCurrency: {
+      symbol: 'APE',
+      name: 'ApeCoin',
+      decimals: 18,
+    },
+    contracts: {
+      multicall3: DEFAULT_MULTICALL3_ADDRESS,
+    },
+  },
+  {
+    chainId: ChainId.SKALE_NEBULA,
+    type: NetworkType.MAINNET,
+    name: 'skale-nebula',
+    title: 'SKALE Nebula Gaming Hub',
+    rpcUrl: getRpcUrl('skale-nebula'),
+    logoUrl: getLogoUrl(ChainId.SKALE_NEBULA),
+    blockExplorer: {
+      name: 'SKALE Nebula Gaming Hub Explorer',
+      url: 'https://green-giddy-denebola.explorer.mainnet.skalenodes.com/',
+    },
+    nativeCurrency: {
+      symbol: 'sFUEL',
+      name: 'SKALE Fuel',
+      decimals: 18,
+    },
+    contracts: {
+      multicall3: DEFAULT_MULTICALL3_ADDRESS,
+    },
+  },
+  {
+    chainId: ChainId.SKALE_BASE_TESTNET,
+    type: NetworkType.TESTNET,
+    name: 'skale-base-testnet',
+    title: 'SKALE Base Testnet',
+    rpcUrl: getRpcUrl('skale-base-testnet'),
+    logoUrl: getLogoUrl(ChainId.SKALE_BASE_TESTNET),
+    blockExplorer: {
+      name: 'SKALE Base Testnet Explorer',
+      url: 'https://base-sepolia-testnet-explorer.skalenodes.com/',
+    },
+    nativeCurrency: {
+      symbol: 'CREDIT',
+      name: 'Credits',
+      decimals: 18,
+    },
+    contracts: {
+      multicall3: DEFAULT_MULTICALL3_ADDRESS,
+    },
+  },
+  {
+    chainId: ChainId.SONEIUM,
+    type: NetworkType.MAINNET,
+    name: 'soneium',
+    title: 'Soneium',
+    rpcUrl: getRpcUrl('soneium'),
+    logoUrl: getLogoUrl(ChainId.SONEIUM),
+    blockExplorer: {
+      name: 'Soneium Explorer',
+      url: 'https://soneium.blockscout.com/',
+    },
+    nativeCurrency: {
+      symbol: 'ETH',
+      name: 'Ether',
+      decimals: 18,
+    },
+    contracts: {
+      multicall3: DEFAULT_MULTICALL3_ADDRESS,
+    },
+  },
+  {
+    chainId: ChainId.SONEIUM_MINATO,
+    type: NetworkType.TESTNET,
+    name: 'soneium-minato',
+    title: 'Soneium Minato (Testnet)',
+    rpcUrl: getRpcUrl('soneium-minato'),
+    logoUrl: getLogoUrl(ChainId.SONEIUM_MINATO),
+    blockExplorer: {
+      name: 'Soneium Minato Explorer',
+      url: 'https://explorer-testnet.soneium.org/',
+    },
+    nativeCurrency: {
+      symbol: 'ETH',
+      name: 'Ether',
+      decimals: 18,
+    },
+    contracts: {
+      multicall3: DEFAULT_MULTICALL3_ADDRESS,
+    },
+  },
+  {
+    chainId: ChainId.ETHERLINK,
+    type: NetworkType.MAINNET,
+    name: 'etherlink',
+    title: 'Etherlink',
+    rpcUrl: getRpcUrl('etherlink'),
+    logoUrl: getLogoUrl(ChainId.ETHERLINK),
+    blockExplorer: {
+      name: 'Etherlink Explorer',
+      url: 'https://explorer.etherlink.com/',
+    },
+    nativeCurrency: {
+      symbol: 'XTZ',
+      name: 'Tez',
+      decimals: 18,
+    },
+    contracts: {
+      multicall3: DEFAULT_MULTICALL3_ADDRESS,
+    },
+  },
+  {
+    chainId: ChainId.ETHERLINK_SHADOWNET_TESTNET,
+    type: NetworkType.TESTNET,
+    name: 'etherlink-shadownet-testnet',
+    title: 'Etherlink Shadownet Testnet',
+    rpcUrl: getRpcUrl('etherlink-shadownet-testnet'),
+    logoUrl: getLogoUrl(ChainId.ETHERLINK_SHADOWNET_TESTNET),
+    blockExplorer: {
+      name: 'Etherlink Shadownet Testnet Explorer',
+      url: 'https://shadownet.explorer.etherlink.com/',
+    },
+    nativeCurrency: {
+      symbol: 'XTZ',
+      name: 'Tez',
+      decimals: 18,
+    },
+    contracts: {
+      multicall3: DEFAULT_MULTICALL3_ADDRESS,
+    },
+  },
+  {
+    chainId: ChainId.MONAD,
+    type: NetworkType.MAINNET,
+    name: 'monad',
+    title: 'Monad',
+    rpcUrl: getRpcUrl('monad'),
+    logoUrl: getLogoUrl(ChainId.MONAD),
+    blockExplorer: {
+      name: 'Monad Explorer',
+      url: 'https://mainnet-beta.monvision.io/',
+    },
+    nativeCurrency: {
+      symbol: 'MON',
+      name: 'MON',
+      decimals: 18,
+    },
+    contracts: {
+      multicall3: DEFAULT_MULTICALL3_ADDRESS,
+    },
+  },
+  {
+    chainId: ChainId.SOMNIA,
+    type: NetworkType.MAINNET,
+    name: 'somnia',
+    title: 'Somnia',
+    rpcUrl: getRpcUrl('somnia'),
+    logoUrl: getLogoUrl(ChainId.SOMNIA),
+    blockExplorer: {
+      name: 'Somnia Explorer',
+      url: 'https://mainnet.somnia.w3us.site/',
+    },
+    nativeCurrency: {
+      symbol: 'SOMI',
+      name: 'SOMI',
+      decimals: 18,
+    },
+    contracts: {
+      multicall3: SEQUENCE_MULTICALL3_ADDRESS,
+    },
+  },
+
+  {
+    chainId: ChainId.SOMNIA_TESTNET,
+    type: NetworkType.TESTNET,
+    name: 'somnia-testnet',
+    title: 'Somnia Testnet',
+    rpcUrl: getRpcUrl('somnia-testnet'),
+    logoUrl: getLogoUrl(ChainId.SOMNIA_TESTNET),
+    blockExplorer: {
+      name: 'Somnia Testnet Explorer',
+      url: 'https://somnia-testnet.socialscan.io/',
+    },
+    nativeCurrency: {
+      symbol: 'STT',
+      name: 'STT',
+      decimals: 18,
+    },
+    contracts: {
+      multicall3: SEQUENCE_MULTICALL3_ADDRESS,
+    },
+  },
+
+  {
+    chainId: ChainId.KATANA,
+    type: NetworkType.MAINNET,
+    name: 'katana',
+    title: 'Katana',
+    rpcUrl: getRpcUrl('katana'),
+    logoUrl: getLogoUrl(ChainId.KATANA),
+    blockExplorer: {
+      name: 'Katana Explorer',
+      url: 'https://katanascan.com/',
+    },
+    nativeCurrency: {
+      symbol: 'ETH',
+      name: 'ETH',
+      decimals: 18,
+    },
+    contracts: {
+      multicall3: DEFAULT_MULTICALL3_ADDRESS,
+    },
+  },
+
+  {
+    chainId: ChainId.ARC_TESTNET,
+    type: NetworkType.TESTNET,
+    name: 'arc-testnet',
+    title: 'Arc Testnet',
+    rpcUrl: getRpcUrl('arc-testnet'),
+    logoUrl: getLogoUrl(ChainId.ARC_TESTNET),
+    blockExplorer: {
+      name: 'Arc Testnet Explorer',
+      url: 'https://1jr2dw1zdqvyes8u.blockscout.com/',
+    },
+    nativeCurrency: {
+      symbol: 'USDC',
+      name: 'USDC',
+      decimals: 6,
+    },
+    contracts: {
+      multicall3: DEFAULT_MULTICALL3_ADDRESS,
+    },
+  },
+
+  {
+    chainId: ChainId.HYPEREVM,
+    type: NetworkType.MAINNET,
+    name: 'hyperevm',
+    title: 'HyperEVM',
+    rpcUrl: getRpcUrl('hyperevm'),
+    logoUrl: getLogoUrl(ChainId.HYPEREVM),
+    blockExplorer: {
+      name: 'HyperEVM Explorer',
+      url: 'https://www.hyperscan.com/',
+    },
+    nativeCurrency: {
+      symbol: 'HYPE',
+      name: 'HYPE',
+      decimals: 18,
+    },
+  },
+
+  {
+    chainId: ChainId.BERACHAIN,
+    type: NetworkType.MAINNET,
+    name: 'berachain',
+    title: 'Berachain',
+    rpcUrl: getRpcUrl('berachain'),
+    logoUrl: getLogoUrl(ChainId.BERACHAIN),
+    blockExplorer: {
+      name: 'Berachain Explorer',
+      url: 'https://berascan.com/',
+    },
+    nativeCurrency: {
+      symbol: 'BEAR',
+      name: 'BEAR',
+      decimals: 18,
+    },
+  },
+
+  {
+    chainId: ChainId.SONIC,
+    type: NetworkType.MAINNET,
+    name: 'sonic',
+    title: 'Sonic',
+    rpcUrl: getRpcUrl('sonic'),
+    logoUrl: getLogoUrl(ChainId.SONIC),
+    blockExplorer: {
+      name: 'Sonic Explorer',
+      url: 'https://sonicscan.com/',
+    },
+    nativeCurrency: {
+      symbol: 'S',
+      name: 'Sonic',
+      decimals: 18,
+    },
+  },
+]
+
+function getRpcUrl(networkName: string): string {
+  return `https://nodes.sequence.app/${networkName}`
+}
+
+function getLogoUrl(chainId: ChainId): string {
+  return `https://assets.sequence.info/images/networks/medium/${chainId}.webp`
+}
+
+export function getNetworkFromName(networkName: string): Network | undefined {
+  return ALL.find((network) => network.name === networkName)
+}
+
+export function getNetworkFromChainId(chainId: ChainId | number | bigint | string): Network | undefined {
+  return ALL.find((network) => network.chainId === Number(chainId))
+}
